@@ -56,8 +56,8 @@ class CommandLineTool(Process):
     def __init__(self, toolpath_object, **kwargs):
         super(CommandLineTool, self).__init__(toolpath_object, **kwargs)
 
-    def makeJobRunner(self, **kwargs):
-        return CommandLineJob(**kwargs)
+    def makeJobRunner(self):
+        return CommandLineJob()
 
     def makePathMapper(self, reffiles, input_basedir, **kwargs):
         dockerReq, _ = self.get_requirement("DockerRequirement")
@@ -101,7 +101,7 @@ class CommandLineTool(Process):
 
         reffiles = set((f["path"] for f in builder.files))
 
-        j = self.makeJobRunner(**kwargs)
+        j = self.makeJobRunner()
         j.joborder = builder.job
         j.stdin = None
         j.stdout = None
@@ -111,6 +111,7 @@ class CommandLineTool(Process):
         j.requirements = self.requirements
         j.hints = self.hints
         j.name = uniquename(kwargs.get("name", str(id(j))))
+        j.resources = builder.resources
 
         _logger.debug("[job %s] initializing from %s%s",
                      j.name,

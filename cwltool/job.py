@@ -8,7 +8,7 @@ import logging
 import sys
 import requests
 import docker
-from process import get_feature, empty_subtree, Process
+from process import get_feature, empty_subtree
 from errors import WorkflowException
 import shutil
 import stat
@@ -34,9 +34,6 @@ def deref_links(outputs):
             deref_links(v)
 
 class CommandLineJob(object):
-    def __init__(self, **kwargs):
-        self.resources = kwargs["resources"]
-
     def run(self, dry_run=False, pull_image=True, rm_container=True, rm_tmpdir=True, move_outputs=True, **kwargs):
         if not os.path.exists(self.outdir):
             os.makedirs(self.outdir)
