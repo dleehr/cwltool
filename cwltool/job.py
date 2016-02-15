@@ -93,6 +93,7 @@ class CommandLineJob(object):
             if not os.path.exists(self.tmpdir):
                 os.makedirs(self.tmpdir)
             env["TMPDIR"] = self.tmpdir
+            # Running into workflow issue here. Inter-step files need to be on shared file system
             resource_requirements = get_feature(self, "ResourceRequirement")
             # TODO: extract resource_requirements
             # TODO: extract job dependencies - not necessary immediately if I use srun instead of sbatch
