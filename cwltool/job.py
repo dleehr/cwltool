@@ -8,7 +8,7 @@ import logging
 import sys
 import requests
 import docker
-from process import get_feature, empty_subtree
+from process import get_feature, empty_subtree, Process
 from errors import WorkflowException
 import shutil
 import stat
@@ -34,6 +34,9 @@ def deref_links(outputs):
             deref_links(v)
 
 class CommandLineJob(object):
+    def __init__(self, **kwargs):
+        self.resources = kwargs["resources"]
+
     def run(self, dry_run=False, pull_image=True, rm_container=True, rm_tmpdir=True, move_outputs=True, **kwargs):
         if not os.path.exists(self.outdir):
             os.makedirs(self.outdir)
@@ -95,11 +98,11 @@ class CommandLineJob(object):
             env["TMPDIR"] = self.tmpdir
             # Running into workflow issue here. Inter-step files need to be on shared file system
             resource_requirements = get_feature(self, "ResourceRequirement")
-            # TODO: extract resource_requirements
-            # TODO: extract job dependencies - not necessary immediately if I use srun instead of sbatch
             runtime = ["srun"]
-            # --mem
-            # --cpus-per-task
+            resources_map = {'cores': '--cpus-per-task', 'ram': '--mem'}
+            for k, v in resources_map.items():
+                if k in self.resources:
+                    runtime.extend([v, str(self.resources[k])])
         else:
             env = self.environment
             if not os.path.exists(self.tmpdir):

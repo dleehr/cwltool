@@ -358,6 +358,7 @@ class Workflow(Process):
         yield wj
 
         kwargs["part_of"] = "workflow %s" % wj.name
+        kwargs["resources"] = builder.resources
 
         for w in wj.job(builder.job, basedir, output_callback, **kwargs):
             yield w
