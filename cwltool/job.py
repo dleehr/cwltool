@@ -44,6 +44,12 @@ class CommandLineJob(object):
         runtime = []
         env = {"TMPDIR": self.tmpdir}
 
+        runtime_engine = None
+
+        # Determine how to run - docker, slurm, or local
+        (slurm_req, slurm_is_req) = get_feature(self, "SlurmRequirement")
+        if slurm_req:
+            runtime_engine = 'slurm'
         (docker_req, docker_is_req) = get_feature(self, "DockerRequirement")
 
         for f in self.pathmapper.files():
@@ -52,13 +58,14 @@ class CommandLineJob(object):
 
         img_id = None
         if docker_req and kwargs.get("use_container") is not False:
+            runtime_engine = 'docker'
             env = os.environ
             img_id = docker.get_from_requirements(docker_req, docker_is_req, pull_image)
 
         if docker_is_req and img_id is None:
             raise WorkflowException("Docker is required for running this tool.")
 
-        if img_id:
+        if runtime_engine == 'docker':
             runtime = ["docker", "run", "-i"]
             for src in self.pathmapper.files():
                 vol = self.pathmapper.mapper(src)
@@ -80,6 +87,13 @@ class CommandLineJob(object):
                 runtime.append("--env=%s=%s" % (t, v))
 
             runtime.append(img_id)
+        elif runtime_engine == 'slurm':
+            resource_requirements = get_feature(self, "ResourceRequirement")
+            # TODO: extract resource_requirements
+            # TODO: extract job dependencies - not necessary immediately if I use srun instead of sbatch
+            runtime = ["srun"]
+            # --mem
+            # --cpus-per-task
         else:
             env = self.environment
             if not os.path.exists(self.tmpdir):
@@ -149,6 +163,10 @@ class CommandLineJob(object):
 
             if stdin == subprocess.PIPE:
                 sp.stdin.close()
+
+            # srun:
+            # srun: job 2893075 queued and waiting for resources (goes to stderr)
+
 
             rcode = sp.wait()
 
