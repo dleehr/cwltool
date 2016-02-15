@@ -536,6 +536,13 @@ $graph:
 
 
 
+- name: SlurmRequirement
+  type: record
+  extends: "#ProcessRequirement"
+  doc: |
+    Indicates that a workflow component should be run under [SLURM](http://slurm.schedmd.com)
+
+
 - name: CreateFileRequirement
   type: record
   extends: "#ProcessRequirement"
