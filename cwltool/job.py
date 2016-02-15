@@ -90,6 +90,9 @@ class CommandLineJob(object):
         elif runtime_engine == 'slurm':
             # For initial slurm version, preserve the environment always
             env = os.environ
+            if not os.path.exists(self.tmpdir):
+                os.makedirs(self.tmpdir)
+            env["TMPDIR"] = self.tmpdir
             resource_requirements = get_feature(self, "ResourceRequirement")
             # TODO: extract resource_requirements
             # TODO: extract job dependencies - not necessary immediately if I use srun instead of sbatch
