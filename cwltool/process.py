@@ -36,7 +36,8 @@ supportedProcessRequirements = ["DockerRequirement",
                                 "MultipleInputFeatureRequirement",
                                 "InlineJavascriptRequirement",
                                 "ShellCommandRequirement",
-                                "StepInputExpressionRequirement"]
+                                "StepInputExpressionRequirement",
+                                "SlurmRequirement"]
 
 cwl_files = ("Workflow.yml",
               "CommandLineTool.yml",
