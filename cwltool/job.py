@@ -170,10 +170,6 @@ class CommandLineJob(object):
             if stdin == subprocess.PIPE:
                 sp.stdin.close()
 
-            # srun:
-            # srun: job 2893075 queued and waiting for resources (goes to stderr)
-
-
             rcode = sp.wait()
 
             if stdin != subprocess.PIPE:
